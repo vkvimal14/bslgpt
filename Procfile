@@ -1,0 +1,1 @@
+web: python [gpt.py](http://_vscodecontentref_/0)
