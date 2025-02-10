@@ -1,0 +1,216 @@
+<!-- filepath: /c:/Users/834821/Documents/Development/BSLGPT/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSL GPT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .chat-container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+        .chat-header {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .chat-messages {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background: #f4f4f9;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .chat-input button {
+            padding: 10px 20px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .chat-input button:hover {
+            background: #0056b3;
+        }
+        .message {
+            margin-bottom: 20px;
+        }
+        .message.user {
+            text-align: right;
+        }
+        .message.user .message-content {
+            background: #007bff;
+            color: white;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .message.bot .message-content {
+            background: #f4f4f9;
+            display: inline-block;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .message-content strong {
+            font-weight: bold;
+        }
+        .message-content code {
+            background: #f4f4f9;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .message-content pre {
+            background: #f4f4f9;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        .message-content ul {
+            padding-left: 20px;
+        }
+        .message-content li {
+            margin-bottom: 5px;
+        }
+        @media (max-width: 600px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            .chat-header {
+                font-size: 1.2em;
+            }
+            .chat-input button {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>BSL GPT</h1>
+            <button id="init-button">Initialize</button>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input">
+            <input type="text" id="question" name="question" placeholder="Type your question..." required>
+            <button type="submit" id="submit-button">Submit</button>
+        </div>
+    </div>
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+
+        document.getElementById('init-button').addEventListener('click', async function() {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'bot');
+            messageDiv.innerHTML = '<div class="message-content">Initializing...</div>';
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            try {
+                const response = await fetch('/api/init', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                messageDiv.innerHTML = `<div class="message-content">${data.message || data.error}</div>`;
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message-content">An error occurred: ${error.message}</div>`;
+            }
+        });
+
+        document.getElementById('submit-button').addEventListener('click', async function(event) {
+            event.preventDefault();
+            submitQuestion();
+        });
+
+        document.getElementById('question').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                submitQuestion();
+            }
+        });
+
+        async function submitQuestion() {
+            const question = document.getElementById('question').value;
+            if (!question) return;
+
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.classList.add('message', 'user');
+            userMessageDiv.innerHTML = `<div class="message-content">${question}</div>`;
+            chatMessages.appendChild(userMessageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            document.getElementById('question').value = '';
+
+            const botMessageDiv = document.createElement('div');
+            botMessageDiv.classList.add('message', 'bot');
+            botMessageDiv.innerHTML = '<div class="message-content">Loading...</div>';
+            chatMessages.appendChild(botMessageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            const history = Array.from(chatMessages.children).map(message => ({
+                role: message.classList.contains('user') ? 'user' : 'bot',
+                content: message.querySelector('.message-content').textContent
+            }));
+
+            try {
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question, history })
+                });
+                const data = await response.json();
+                botMessageDiv.innerHTML = `<div class="message-content">${formatResponse(data.answer || data.error)}</div>`;
+            } catch (error) {
+                botMessageDiv.innerHTML = `<div class="message-content">An error occurred: ${error.message}</div>`;
+            }
+        }
+
+        function formatResponse(response) {
+            // Convert **text** to bold
+            response = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Convert `text` to inline code
+            response = response.replace(/`([^`]+)`/g, '<code>$1</code>');
+            // Convert ```text``` to code block
+            response = response.replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>');
+            // Convert \n to <br>
+            response = response.replace(/\n/g, '<br>');
+            // Convert - list items to <ul><li>
+            response = response.replace(/^- (.*)$/gm, '<ul><li>$1</li></ul>');
+            return response;
+        }
+    </script>
+</body>
+</html>
