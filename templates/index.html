@@ -1,118 +1,349 @@
-<!-- filepath: /c:/Users/834821/Documents/Development/BSLGPT/templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BSL GPT</title>
+    <title>BSL GPT - AI Document Assistant</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
+        
         .chat-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 90vh;
+            margin: 20px;
         }
+        
         .chat-header {
-            background: #007bff;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
             color: white;
-            padding: 10px;
+            padding: 20px;
             text-align: center;
+            position: relative;
         }
+        
+        .chat-header h1 {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
         .chat-messages {
             padding: 20px;
             flex: 1;
             overflow-y: auto;
-            border-bottom: 1px solid #ddd;
+            background: #f8f9fa;
+            scroll-behavior: smooth;
         }
-        .chat-input {
-            display: flex;
-            padding: 10px;
-            background: #f4f4f9;
+        
+        .welcome-message {
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
         }
-        .chat-input input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-right: 10px;
-        }
-        .chat-input button {
-            padding: 10px 20px;
-            border: none;
-            background: #007bff;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .chat-input button:hover {
-            background: #0056b3;
-        }
-        .message {
+        
+        .welcome-message i {
+            font-size: 3em;
+            color: #2196F3;
             margin-bottom: 20px;
         }
+        
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .input-group {
+            flex: 1;
+            position: relative;
+        }
+        
+        .chat-input input[type="text"] {
+            width: 100%;
+            padding: 15px 50px 15px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s ease;
+            resize: none;
+        }
+        
+        .chat-input input[type="text"]:focus {
+            border-color: #2196F3;
+        }
+        
+        .input-actions {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-icon {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 50%;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-icon:hover {
+            background: #1976D2;
+            transform: scale(1.1);
+        }
+        
+        .btn-icon:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .message.user {
             text-align: right;
         }
+        
         .message.user .message-content {
-            background: #007bff;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
             color: white;
             display: inline-block;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px 18px;
+            border-radius: 18px 18px 4px 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
         }
+        
         .message.bot .message-content {
-            background: #f4f4f9;
+            background: white;
             display: inline-block;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
+            padding: 12px 18px;
+            border-radius: 18px 18px 18px 4px;
+            border: 1px solid #e0e0e0;
+            max-width: 80%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+        
+        .message-metadata {
+            font-size: 0.75em;
+            color: #666;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .message.user .message-metadata {
+            justify-content: flex-end;
+        }
+        
+        .confidence-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7em;
+        }
+        
         .message-content strong {
-            font-weight: bold;
+            font-weight: 600;
         }
+        
         .message-content code {
-            background: #f4f4f9;
-            padding: 2px 4px;
+            background: #f5f5f5;
+            padding: 2px 6px;
             border-radius: 4px;
-            font-family: monospace;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.9em;
         }
+        
         .message-content pre {
-            background: #f4f4f9;
-            padding: 10px;
+            background: #f5f5f5;
+            padding: 12px;
             border-radius: 8px;
             overflow-x: auto;
+            margin: 8px 0;
+            border-left: 4px solid #2196F3;
         }
+        
         .message-content ul {
             padding-left: 20px;
+            margin: 8px 0;
         }
+        
         .message-content li {
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
-        @media (max-width: 600px) {
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+        
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: #666;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+        
+        .status-bar {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.8em;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4caf50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        @media (max-width: 768px) {
             .chat-container {
                 height: 100vh;
                 border-radius: 0;
+                margin: 0;
             }
-            .chat-header {
-                font-size: 1.2em;
+            
+            .message.user .message-content,
+            .message.bot .message-content {
+                max-width: 90%;
             }
-            .chat-input button {
-                padding: 10px;
+            
+            .header-controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn {
+                font-size: 0.8em;
+                padding: 6px 12px;
             }
         }
     </style>
@@ -120,97 +351,285 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>BSL GPT</h1>
-            <button id="init-button">Initialize</button>
+            <h1><i class="fas fa-robot"></i> BSL GPT</h1>
+            <p>AI-Powered Document Assistant for Bokaro Steel Plant</p>
+            <div class="header-controls">
+                <button id="init-button" class="btn btn-primary">
+                    <i class="fas fa-sync"></i> Initialize Documents
+                </button>
+                <button id="docs-button" class="btn btn-primary">
+                    <i class="fas fa-file-alt"></i> View Documents
+                </button>
+                <button id="stats-button" class="btn btn-primary">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </button>
+            </div>
         </div>
-        <div class="chat-messages" id="chat-messages"></div>
-        <div class="chat-input">
-            <input type="text" id="question" name="question" placeholder="Type your question..." required>
-            <button type="submit" id="submit-button">Submit</button>
+        
+        <div class="chat-messages" id="chat-messages">
+            <div class="welcome-message">
+                <i class="fas fa-comments"></i>
+                <h3>Welcome to BSL GPT!</h3>
+                <p>I'm your AI assistant for Bokaro Steel Plant documentation. Ask me anything about BSL procedures, policies, and guidelines.</p>
+                <p><strong>Try asking:</strong> "What is the procurement procedure?" or "What are the payment terms?"</p>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Ready</span>
+            </div>
+            <div id="doc-count">Documents: Loading...</div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="chat-input">
+                <div class="input-group">
+                    <input type="text" id="question" name="question" placeholder="Ask me anything about BSL documents..." maxlength="1000">
+                    <div class="input-actions">
+                        <button type="button" id="submit-button" class="btn-icon" title="Send message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
     <script>
-        const chatMessages = document.getElementById('chat-messages');
-
-        document.getElementById('init-button').addEventListener('click', async function() {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', 'bot');
-            messageDiv.innerHTML = '<div class="message-content">Initializing...</div>';
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            try {
-                const response = await fetch('/api/init', {
-                    method: 'POST'
-                });
-                const data = await response.json();
-                messageDiv.innerHTML = `<div class="message-content">${data.message || data.error}</div>`;
-            } catch (error) {
-                messageDiv.innerHTML = `<div class="message-content">An error occurred: ${error.message}</div>`;
+        class BSLGPTChat {
+            constructor() {
+                this.chatMessages = document.getElementById('chat-messages');
+                this.questionInput = document.getElementById('question');
+                this.submitButton = document.getElementById('submit-button');
+                this.initButton = document.getElementById('init-button');
+                this.docsButton = document.getElementById('docs-button');
+                this.statsButton = document.getElementById('stats-button');
+                this.docCount = document.getElementById('doc-count');
+                
+                this.isProcessing = false;
+                this.initializeEventListeners();
+                this.loadDocumentCount();
             }
-        });
-
-        document.getElementById('submit-button').addEventListener('click', async function(event) {
-            event.preventDefault();
-            submitQuestion();
-        });
-
-        document.getElementById('question').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                submitQuestion();
-            }
-        });
-
-        async function submitQuestion() {
-            const question = document.getElementById('question').value;
-            if (!question) return;
-
-            const userMessageDiv = document.createElement('div');
-            userMessageDiv.classList.add('message', 'user');
-            userMessageDiv.innerHTML = `<div class="message-content">${question}</div>`;
-            chatMessages.appendChild(userMessageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            document.getElementById('question').value = '';
-
-            const botMessageDiv = document.createElement('div');
-            botMessageDiv.classList.add('message', 'bot');
-            botMessageDiv.innerHTML = '<div class="message-content">Loading...</div>';
-            chatMessages.appendChild(botMessageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            const history = Array.from(chatMessages.children).map(message => ({
-                role: message.classList.contains('user') ? 'user' : 'bot',
-                content: message.querySelector('.message-content').textContent
-            }));
-
-            try {
-                const response = await fetch('/api/query', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ question, history })
+            
+            initializeEventListeners() {
+                this.submitButton.addEventListener('click', () => this.submitQuestion());
+                this.questionInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.submitQuestion();
+                    }
                 });
-                const data = await response.json();
-                botMessageDiv.innerHTML = `<div class="message-content">${formatResponse(data.answer || data.error)}</div>`;
-            } catch (error) {
-                botMessageDiv.innerHTML = `<div class="message-content">An error occurred: ${error.message}</div>`;
+                
+                this.initButton.addEventListener('click', () => this.initializeDocuments());
+                this.docsButton.addEventListener('click', () => this.showDocuments());
+                this.statsButton.addEventListener('click', () => this.showStatistics());
+                
+                // Auto-resize input and enable/disable submit button
+                this.questionInput.addEventListener('input', () => {
+                    this.submitButton.disabled = !this.questionInput.value.trim() || this.isProcessing;
+                });
+            }
+            
+            async loadDocumentCount() {
+                try {
+                    const response = await fetch('/api/stats');
+                    const data = await response.json();
+                    const totalDocs = data.documents?.total || 0;
+                    const processedDocs = data.documents?.processed || 0;
+                    this.docCount.textContent = `Documents: ${processedDocs}/${totalDocs} processed`;
+                } catch (error) {
+                    this.docCount.textContent = 'Documents: Error loading';
+                }
+            }
+            
+            async initializeDocuments() {
+                const originalText = this.initButton.innerHTML;
+                this.initButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing...';
+                this.initButton.disabled = true;
+                
+                const messageDiv = this.addMessage('bot', '<div class="typing-indicator"><i class="fas fa-cog fa-spin"></i> Initializing documents...</div>');
+                
+                try {
+                    const response = await fetch('/api/init', { method: 'POST' });
+                    const data = await response.json();
+                    
+                    messageDiv.innerHTML = `<div class="message-content">
+                        <i class="fas fa-check-circle" style="color: #4caf50;"></i> 
+                        ${data.message || data.error}
+                    </div>`;
+                    
+                    this.loadDocumentCount();
+                } catch (error) {
+                    messageDiv.innerHTML = `<div class="message-content">
+                        <i class="fas fa-exclamation-triangle" style="color: #f44336;"></i> 
+                        Error: ${error.message}
+                    </div>`;
+                } finally {
+                    this.initButton.innerHTML = originalText;
+                    this.initButton.disabled = false;
+                }
+            }
+            
+            async showDocuments() {
+                const messageDiv = this.addMessage('bot', '<div class="typing-indicator">Loading document list...</div>');
+                
+                try {
+                    const response = await fetch('/api/documents');
+                    const data = await response.json();
+                    
+                    let content = '<strong>📄 Available Documents:</strong><br><br>';
+                    if (data.documents && data.documents.length > 0) {
+                        data.documents.forEach(doc => {
+                            const status = doc.status === 'completed' ? 
+                                '<i class="fas fa-check" style="color: #4caf50;"></i>' : 
+                                '<i class="fas fa-exclamation" style="color: #f44336;"></i>';
+                            const size = (doc.file_size / 1024).toFixed(1);
+                            content += `${status} <strong>${doc.filename}</strong><br>`;
+                            content += `&nbsp;&nbsp;&nbsp;&nbsp;Size: ${size} KB | Words: ${doc.word_count} | Pages: ${doc.page_count}<br><br>`;
+                        });
+                    } else {
+                        content += 'No documents found. Please initialize documents first.';
+                    }
+                    
+                    messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
+                } catch (error) {
+                    messageDiv.innerHTML = `<div class="message-content">Error loading documents: ${error.message}</div>`;
+                }
+            }
+            
+            async showStatistics() {
+                const messageDiv = this.addMessage('bot', '<div class="typing-indicator">Loading statistics...</div>');
+                
+                try {
+                    const response = await fetch('/api/stats');
+                    const data = await response.json();
+                    
+                    const docs = data.documents || {};
+                    const system = data.system || {};
+                    
+                    const content = `
+                        <strong>📊 System Statistics:</strong><br><br>
+                        <strong>Documents:</strong><br>
+                        • Total: ${docs.total || 0}<br>
+                        • Processed: ${docs.processed || 0}<br>
+                        • Errors: ${docs.errors || 0}<br>
+                        • Total Size: ${((docs.total_size || 0) / 1024 / 1024).toFixed(2)} MB<br>
+                        • Total Words: ${(docs.total_words || 0).toLocaleString()}<br>
+                        • Total Pages: ${docs.total_pages || 0}<br><br>
+                        <strong>System:</strong><br>
+                        • Version: ${system.version || 'Unknown'}<br>
+                        • AI Model: ${system.ai_model || 'Unknown'}<br>
+                        • PDF Folder: ${system.pdf_folder || 'Unknown'}
+                    `;
+                    
+                    messageDiv.innerHTML = `<div class="message-content">${content}</div>`;
+                } catch (error) {
+                    messageDiv.innerHTML = `<div class="message-content">Error loading statistics: ${error.message}</div>`;
+                }
+            }
+            
+            async submitQuestion() {
+                const question = this.questionInput.value.trim();
+                if (!question || this.isProcessing) return;
+                
+                this.isProcessing = true;
+                this.submitButton.disabled = true;
+                
+                // Add user message
+                this.addMessage('user', question);
+                this.questionInput.value = '';
+                
+                // Add typing indicator
+                const botMessageDiv = this.addMessage('bot', 
+                    '<div class="typing-indicator"><div class="typing-dots"><span></span><span></span><span></span></div> Thinking...</div>'
+                );
+                
+                const startTime = Date.now();
+                
+                try {
+                    const response = await fetch('/api/query', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question })
+                    });
+                    
+                    const data = await response.json();
+                    const processingTime = Date.now() - startTime;
+                    
+                    let content = this.formatResponse(data.answer || data.error);
+                    let metadata = '';
+                    
+                    if (data.confidence_score) {
+                        const confidence = Math.round(data.confidence_score * 100);
+                        metadata += `<div class="confidence-score"><i class="fas fa-brain"></i> ${confidence}% confidence</div>`;
+                    }
+                    
+                    if (data.documents_used && data.documents_used.length > 0) {
+                        metadata += `<div><i class="fas fa-file"></i> ${data.documents_used.length} document(s) used</div>`;
+                    }
+                    
+                    metadata += `<div><i class="fas fa-clock"></i> ${processingTime}ms</div>`;
+                    
+                    botMessageDiv.innerHTML = `
+                        <div class="message-content">${content}</div>
+                        <div class="message-metadata">${metadata}</div>
+                    `;
+                    
+                } catch (error) {
+                    botMessageDiv.innerHTML = `
+                        <div class="message-content">
+                            <i class="fas fa-exclamation-triangle" style="color: #f44336;"></i> 
+                            Sorry, I encountered an error: ${error.message}
+                        </div>
+                    `;
+                } finally {
+                    this.isProcessing = false;
+                    this.submitButton.disabled = false;
+                    this.questionInput.focus();
+                }
+            }
+            
+            addMessage(role, content) {
+                // Remove welcome message if it exists
+                const welcomeMsg = this.chatMessages.querySelector('.welcome-message');
+                if (welcomeMsg) {
+                    welcomeMsg.remove();
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message', role);
+                messageDiv.innerHTML = typeof content === 'string' ? 
+                    `<div class="message-content">${content}</div>` : content;
+                
+                this.chatMessages.appendChild(messageDiv);
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                
+                return messageDiv;
+            }
+            
+            formatResponse(response) {
+                if (!response) return '';
+                
+                // Convert markdown-style formatting
+                response = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                response = response.replace(/`([^`]+)`/g, '<code>$1</code>');
+                response = response.replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>');
+                response = response.replace(/\n/g, '<br>');
+                
+                // Convert bullet points
+                response = response.replace(/^[\s]*[-*+]\s+(.*)$/gm, '<li>$1</li>');
+                response = response.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+                
+                return response;
             }
         }
-
-        function formatResponse(response) {
-            // Convert **text** to bold
-            response = response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // Convert `text` to inline code
-            response = response.replace(/`([^`]+)`/g, '<code>$1</code>');
-            // Convert ```text``` to code block
-            response = response.replace(/```([^`]+)```/g, '<pre><code>$1</code></pre>');
-            // Convert \n to <br>
-            response = response.replace(/\n/g, '<br>');
-            // Convert - list items to <ul><li>
-            response = response.replace(/^- (.*)$/gm, '<ul><li>$1</li></ul>');
-            return response;
-        }
+        
+        // Initialize the chat application
+        document.addEventListener('DOMContentLoaded', () => {
+            new BSLGPTChat();
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  bslgpt:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PDF_FOLDER=/app/pdf
+      - DATABASE_URL=sqlite:///app/data/bslgpt.db
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./pdf:/app/pdf
+      - bslgpt_data:/app/data
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  bslgpt_data:
+  redis_data:
